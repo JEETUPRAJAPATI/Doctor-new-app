@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -17,6 +16,7 @@ import { CountrySelector } from '@/components/auth/CountrySelector';
 import { CountryList } from '@/components/auth/CountryList';
 import { GoogleButton } from '@/components/auth/GoogleButton';
 import { useCountries } from '@/services/countryService';
+import { Image } from '@/components/ui/Image';
 
 export default function Login() {
   const router = useRouter();
@@ -34,7 +34,6 @@ export default function Login() {
   };
 
   const handleGoogleSignIn = () => {
-    // For demo, directly navigate to dashboard
     router.replace('/dashboard');
   };
 
@@ -45,19 +44,11 @@ export default function Login() {
         style={styles.keyboardView}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.content}>
-            <Image
-              source={require('../assets/images/icon.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
+            <Image type="APP_ICON" style={styles.logo} />
             <Text style={styles.title}>DoctoPro</Text>
 
             <View style={styles.illustrationContainer}>
-              <Image
-                source={require('../assets/images/adaptive-icon.png')}
-                style={styles.illustration}
-                resizeMode="contain"
-              />
+              <Image type="APP_ICON" style={styles.illustration} />
             </View>
 
             <View style={styles.inputContainer}>

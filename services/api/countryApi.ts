@@ -1,6 +1,8 @@
 import { Country } from '@/types/country';
+import { defaultCountries } from '@/utils/defaultCountries';
+import { getDialCode, getFlagUrl } from '@/utils/api/countryUtils';
 
-const API_URL = 'https://restcountries.com/v3.1/all?fields=name,cca2,idd,flags';
+const API_URL = 'https://api.first.org/data/v1/countries';
 
 export async function fetchCountriesFromApi(): Promise<Country[]> {
   try {
@@ -12,21 +14,23 @@ export async function fetchCountriesFromApi(): Promise<Country[]> {
     
     const data = await response.json();
     
-    return data
-      .filter((country: any) => 
-        country.idd?.root && 
-        country.flags?.png && 
-        country.name?.common
-      )
-      .map((country: any) => ({
-        name: country.name.common,
-        code: country.cca2,
-        dialCode: `${country.idd.root}${country.idd.suffixes?.[0] || ''}`,
-        flag: country.flags.png
-      }));
+    if (!data?.data || Object.keys(data.data).length === 0) {
+      return defaultCountries;
+    }
+
+    const countries: Country[] = Object.entries(data.data)
+      .map(([code, country]: [string, any]) => ({
+        name: country.country,
+        code: code,
+        dialCode: getDialCode(code),
+        flag: getFlagUrl(code)
+      }))
+      .filter(country => country.name && country.dialCode);
+
+    return countries;
       
   } catch (error) {
     console.error('Failed to fetch countries:', error);
-    throw error;
+    return defaultCountries;
   }
 }

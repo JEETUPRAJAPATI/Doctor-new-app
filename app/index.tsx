@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Animated, { 
   useAnimatedStyle, 
@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
   runOnJS
 } from 'react-native-reanimated';
+import { Image } from '@/components/ui/Image';
 
 export default function Index() {
   const router = useRouter();
@@ -42,11 +43,7 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.logoContainer, animatedStyle]}>
-        <Image
-          source={require('../assets/images/icon.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <Image type="APP_ICON" style={styles.logo} />
         <Animated.Text style={[styles.title]}>DoctoPro</Animated.Text>
       </Animated.View>
     </View>
