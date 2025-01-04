@@ -1,87 +1,101 @@
-import React from 'react';
-import {StyleSheet, Button, View, Text, Alert} from 'react-native';
-import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
-const Separator = () => <View style={styles.separator} />;
-
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Link } from 'expo-router';
+import { Header } from '@/components/home/Header';
+import { SearchBar } from '@/components/home/SearchBar';
+import { CategoryCard } from '@/components/home/CategoryCard';
+import { OfferCard } from '@/components/home/OfferCard';
+import { categories } from '@/data/categories';
+import { offers } from '@/data/offers';
 
 export default function HomeScreen() {
+  const [searchQuery, setSearchQuery] = useState('');
+
   return (
-    <SafeAreaProvider>
     <SafeAreaView style={styles.container}>
-      <View>
-        <Text style={styles.title}>
-          The title and onPress handler are required. It is recommended to set
-          accessibilityLabel to help make your app usable by everyone.
-        </Text>
-        <Button
-          title="Press me"
-          onPress={() => Alert.alert('Simple Button pressed')}
+      <ScrollView>
+        <Header />
+
+        <Text style={styles.greeting}>Hello, Test user.</Text>
+        <Text style={styles.title}>Find your medicines</Text>
+
+        <SearchBar 
+          value={searchQuery}
+          onChangeText={setSearchQuery}
         />
-      </View>
-      <Separator />
-      <View>
-        <Text style={styles.title}>
-          Adjust the color in a way that looks standard on each platform. On
-          iOS, the color prop controls the color of the text. On Android, the
-          color adjusts the background color of the button.
-        </Text>
-        <Button
-          title="Press me"
-          color="#f194ff"
-          onPress={() => Alert.alert('Button with adjusted color pressed')}
-        />
-      </View>
-      <Separator />
-      <View>
-        <Text style={styles.title}>
-          All interaction for the component are disabled.
-        </Text>
-        <Button
-          title="Press me"
-          disabled
-          onPress={() => Alert.alert('Cannot press this one')}
-        />
-      </View>
-      <Separator />
-      <View>
-        <Text style={styles.title}>
-          This layout strategy lets the title define the width of the button.
-        </Text>
-        <View style={styles.fixToText}>
-          <Button
-            title="Left button"
-            onPress={() => Alert.alert('Left button pressed')}
-          />
-          <Button
-            title="Right button"
-            onPress={() => Alert.alert('Right button pressed')}
-          />
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Shop by Category</Text>
+          <Link href="/categories" style={styles.viewAll}>View all</Link>
         </View>
-      </View>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
+          {categories.map(category => (
+            <CategoryCard
+              key={category.id}
+              category={category}
+              onPress={() => {}}
+            />
+          ))}
+        </ScrollView>
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Offers</Text>
+          <Link href="/offers" style={styles.viewAll}>View all</Link>
+        </View>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.offersContainer}>
+          {offers.map(offer => (
+            <OfferCard
+              key={offer.id}
+              offer={offer}
+              onPress={() => {}}
+            />
+          ))}
+        </ScrollView>
+      </ScrollView>
     </SafeAreaView>
-  </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    marginHorizontal: 16,
+    backgroundColor: '#000',
+  },
+  greeting: {
+    color: '#666',
+    fontSize: 16,
+    marginLeft: 16,
   },
   title: {
-    textAlign: 'center',
-    marginVertical: 8,
-    color:"white"
+    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginLeft: 16,
+    marginTop: 8,
   },
-  fixToText: {
+  sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
   },
-  separator: {
-    marginVertical: 8,
-    borderBottomColor: '#737373',
-    borderBottomWidth: StyleSheet.hairlineWidth,
+  sectionTitle: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: '600',
+  },
+  viewAll: {
+    color: '#6366f1',
+    fontSize: 14,
+  },
+  categoriesContainer: {
+    paddingLeft: 16,
+  },
+  offersContainer: {
+    paddingLeft: 16,
+    paddingBottom: 16,
   },
 });
-
