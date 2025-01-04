@@ -51,7 +51,7 @@ export default function Login() {
               resizeMode="contain"
             />
             <Text style={styles.title}>DoctoPro</Text>
-            
+
             <View style={styles.illustrationContainer}>
               <Image
                 source={require('../assets/images/adaptive-icon.png')}
