@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Country } from '@/types/country';
 import { fetchCountriesFromApi } from '@/services/api/countryApi';
-import { defaultCountries } from '@/utils/defaultCountries';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CACHE_KEY = 'cached_countries';
 const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
 
 export function useCountries() {
-  const [countries, setCountries] = useState<Country[]>(defaultCountries);
+  const [countries, setCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,7 +17,7 @@ export function useCountries() {
 
   const loadCountries = async () => {
     try {
-      // Try to load from cache first
+      // Try to get cached data first
       const cachedData = await getCachedCountries();
       if (cachedData) {
         setCountries(cachedData);
@@ -28,18 +27,13 @@ export function useCountries() {
 
       // If no cache, fetch from API
       const fetchedCountries = await fetchCountriesFromApi();
-      const sortedCountries = fetchedCountries.sort((a, b) => 
-        a.name.localeCompare(b.name)
-      );
-      
-      setCountries(sortedCountries);
-      // Cache the results
-      await cacheCountries(sortedCountries);
+      setCountries(fetchedCountries);
+      await cacheCountries(fetchedCountries);
+      setError(null);
       
     } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load countries');
       console.error('Error loading countries:', err);
-      setError('Unable to load countries. Using default list.');
-      setCountries(defaultCountries);
     } finally {
       setLoading(false);
     }
@@ -51,9 +45,9 @@ export function useCountries() {
       if (!cached) return null;
 
       const { data, timestamp } = JSON.parse(cached);
-      const isExpired = Date.now() - timestamp > CACHE_EXPIRY;
+      if (Date.now() - timestamp > CACHE_EXPIRY) return null;
       
-      return isExpired ? null : data;
+      return data;
     } catch {
       return null;
     }
@@ -61,15 +55,14 @@ export function useCountries() {
 
   const cacheCountries = async (data: Country[]) => {
     try {
-      const cacheData = {
+      await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({
         data,
         timestamp: Date.now()
-      };
-      await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+      }));
     } catch (err) {
       console.error('Failed to cache countries:', err);
     }
   };
 
-  return { countries, loading, error };
+  return { countries, loading, error, refetch: loadCountries };
 }

@@ -1,6 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, TextInput } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { ThemedText } from '@/components/ui/ThemedText';
+import { useTheme } from '@/context/ThemeContext';
+import { lightTheme, darkTheme } from '@/constants/theme';
 
 type Props = {
   value: string;
@@ -8,17 +12,22 @@ type Props = {
 };
 
 export function SearchBar({ value, onChangeText }: Props) {
+  const router = useRouter();
+  const { theme } = useTheme();
+  const themeColors = theme === 'light' ? lightTheme : darkTheme;
+
+  const handlePress = () => {
+    router.push('/search');
+  };
+
   return (
-    <View style={styles.container}>
-      <Ionicons name="search-outline" size={20} color="#666" />
-      <TextInput
-        style={styles.input}
-        placeholder="Search medicines"
-        placeholderTextColor="#666"
-        value={value}
-        onChangeText={onChangeText}
-      />
-    </View>
+    <TouchableOpacity 
+      style={[styles.container, { backgroundColor: themeColors.searchBar }]} 
+      onPress={handlePress}
+    >
+      <Ionicons name="search-outline" size={20} color={themeColors.textSecondary} />
+      <ThemedText style={styles.input}>Search medicines</ThemedText>
+    </TouchableOpacity>
   );
 }
 
@@ -26,7 +35,6 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#333',
     margin: 16,
     padding: 12,
     borderRadius: 8,
@@ -34,6 +42,6 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     marginLeft: 8,
-    color: 'white',
+    fontSize: 16,
   },
 });

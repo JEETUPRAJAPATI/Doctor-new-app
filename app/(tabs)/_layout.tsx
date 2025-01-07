@@ -1,16 +1,21 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@/context/ThemeContext';
+import { lightTheme, darkTheme } from '@/constants/theme';
 
 export default function TabLayout() {
+  const { theme } = useTheme();
+  const themeColors = theme === 'light' ? lightTheme : darkTheme;
+
   return (
     <Tabs
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: '#000',
-          borderTopColor: '#333',
+          backgroundColor: themeColors.tabBar,
+          borderTopColor: themeColors.tabBarBorder,
         },
-        tabBarActiveTintColor: '#6366f1',
-        tabBarInactiveTintColor: '#666',
+        tabBarActiveTintColor: themeColors.primary,
+        tabBarInactiveTintColor: themeColors.textSecondary,
         headerShown: false,
       }}>
       <Tabs.Screen
@@ -37,15 +42,6 @@ export default function TabLayout() {
           title: 'Hospitals',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="business" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="ambulance"
-        options={{
-          title: 'Ambulance',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="car" size={size} color={color} />
           ),
         }}
       />

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Firstapp",
-    "slug": "Firstapp",
+    "slug": "doctopro",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "myapp",
@@ -24,6 +24,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "1451976d-c939-4e17-b8c9-93a7c900f0e6"
+      }
+    },
+    "owner": "jection"
   }
 }

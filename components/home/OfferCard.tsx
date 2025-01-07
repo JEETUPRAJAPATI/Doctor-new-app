@@ -1,6 +1,9 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, Image, Text } from 'react-native';
+import { StyleSheet, TouchableOpacity, Image, View } from 'react-native';
 import { Offer } from '@/types/medical';
+import { ThemedText } from '@/components/ui/ThemedText';
+import { useTheme } from '@/context/ThemeContext';
+import { lightTheme, darkTheme } from '@/constants/theme';
 
 type Props = {
   offer: Offer;
@@ -8,9 +11,12 @@ type Props = {
 };
 
 export function OfferCard({ offer, onPress }: Props) {
+  const { theme } = useTheme();
+  const themeColors = theme === 'light' ? lightTheme : darkTheme;
+
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: offer.color }]}
+      style={[styles.card, { backgroundColor: themeColors.surface }]}
       onPress={onPress}
     >
       <Image 
@@ -18,7 +24,7 @@ export function OfferCard({ offer, onPress }: Props) {
         style={styles.image}
         resizeMode="cover"
       />
-      <Text style={styles.title}>{offer.title}</Text>
+      <ThemedText style={styles.title}>{offer.title}</ThemedText>
     </TouchableOpacity>
   );
 }
@@ -37,7 +43,6 @@ const styles = StyleSheet.create({
   },
   title: {
     padding: 8,
-    color: '#000',
     fontWeight: '600',
   },
 });

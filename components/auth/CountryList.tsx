@@ -50,7 +50,7 @@ export function CountryList({ visible, onClose, countries, onSelect, loading }: 
 
         <TextInput
           style={styles.searchInput}
-          placeholder="Search country name or code..."
+          placeholder="Search country name or dial code..."
           value={searchQuery}
           onChangeText={setSearchQuery}
           autoFocus
