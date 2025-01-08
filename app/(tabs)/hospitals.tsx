@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, FlatList, Image, TextInput, View, Dimensions } from 'react-native';
+import { StyleSheet, TouchableOpacity, FlatList, Image, View, ScrollView, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import Carousel from 'react-native-snap-carousel';
 import { ThemedView } from '@/components/ui/ThemedView';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { useTheme } from '@/context/ThemeContext';
 import { lightTheme, darkTheme } from '@/constants/theme';
-import { hospitals, categories } from '@/data/hospitals';
 import { getResponsiveValue, getResponsiveFontSize, getResponsiveSpacing } from '@/utils/responsive';
 
 const { width } = Dimensions.get('window');
@@ -16,35 +14,123 @@ const maxContentWidth = 1200;
 const isTablet = width >= 768;
 const numColumns = isTablet ? 2 : 1;
 
+// Hospital categories data
+const hospitalCategories = [
+  {
+    id: 1,
+    name: 'General',
+    icon: '🏥',
+    color: '#FF9999'
+  },
+  {
+    id: 2,
+    name: 'Specialized',
+    icon: '⚕️',
+    color: '#99FF99'
+  },
+  {
+    id: 3,
+    name: 'Pediatrics',
+    icon: '👶',
+    color: '#99CCFF'
+  },
+  {
+    id: 4,
+    name: 'Emergency',
+    icon: '🚑',
+    color: '#FFB366'
+  },
+  {
+    id: 5,
+    name: 'Mental Health',
+    icon: '🧠',
+    color: '#FF99CC'
+  }
+];
+
+// Dummy hospital data by category
+const hospitalData = {
+  'General': [
+    {
+      id: 1,
+      name: 'City General Hospital',
+      description: 'Full-service medical facility with 24/7 care',
+      rating: 4.5,
+      distance: '2.5 km',
+      image: 'https://img.freepik.com/free-vector/hospital-building-concept-illustration_114360-8440.jpg',
+      beds: 500,
+      doctors: 150
+    },
+    {
+      id: 2,
+      name: 'Metro Medical Center',
+      description: 'Modern healthcare facility with advanced technology',
+      rating: 4.3,
+      distance: '3.8 km',
+      image: 'https://img.freepik.com/free-vector/hospital-building-concept-illustration_114360-8440.jpg',
+      beds: 300,
+      doctors: 100
+    }
+  ],
+  'Specialized': [
+    {
+      id: 3,
+      name: 'Heart & Vascular Institute',
+      description: 'Specialized cardiac care center',
+      rating: 4.8,
+      distance: '4.2 km',
+      image: 'https://img.freepik.com/free-vector/hospital-building-concept-illustration_114360-8440.jpg',
+      beds: 200,
+      doctors: 80
+    }
+  ],
+  'Pediatrics': [
+    {
+      id: 4,
+      name: 'Happy Kids Hospital',
+      description: 'Specialized in child healthcare',
+      rating: 4.7,
+      distance: '3.0 km',
+      image: 'https://img.freepik.com/free-vector/hospital-building-concept-illustration_114360-8440.jpg',
+      beds: 150,
+      doctors: 60
+    }
+  ],
+  'Emergency': [
+    {
+      id: 5,
+      name: 'City Emergency Center',
+      description: '24/7 emergency care available',
+      rating: 4.6,
+      distance: '1.5 km',
+      image: 'https://img.freepik.com/free-vector/hospital-building-concept-illustration_114360-8440.jpg',
+      beds: 100,
+      doctors: 40
+    }
+  ],
+  'Mental Health': [
+    {
+      id: 6,
+      name: 'Mind Wellness Center',
+      description: 'Comprehensive mental health services',
+      rating: 4.4,
+      distance: '5.0 km',
+      image: 'https://img.freepik.com/free-vector/hospital-building-concept-illustration_114360-8440.jpg',
+      beds: 120,
+      doctors: 30
+    }
+  ]
+};
+
 export default function HospitalsScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
   const router = useRouter();
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
-
-  const filteredHospitals = hospitals.filter(hospital =>
-    (selectedCategory ? hospital.type === selectedCategory : true) &&
-    (searchQuery ? 
-      hospital.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      hospital.type.toLowerCase().includes(searchQuery.toLowerCase())
-      : true
-    )
-  );
-
-  const renderCategoryCard = ({ item }) => (
-    <TouchableOpacity 
-      style={[styles.categoryCard, { backgroundColor: item.color }]}
-      onPress={() => setSelectedCategory(selectedCategory === item.title ? '' : item.title)}
-    >
-      <Image source={{ uri: item.image }} style={styles.categoryImage} />
-      <ThemedText style={styles.categoryTitle}>{item.title}</ThemedText>
-    </TouchableOpacity>
-  );
+  const [selectedCategory, setSelectedCategory] = useState('General');
 
   const renderHospitalCard = ({ item }) => (
     <TouchableOpacity 
-      style={[styles.hospitalCard, { backgroundColor: item.color }]}
+      style={[styles.hospitalCard, { backgroundColor: themeColors.surface }]}
       onPress={() => router.push(`/hospital/${item.id}`)}
     >
       <Image source={{ uri: item.image }} style={styles.hospitalImage} />
@@ -56,22 +142,28 @@ export default function HospitalsScreen() {
             <ThemedText style={styles.rating}>{item.rating}</ThemedText>
           </View>
         </View>
-        <ThemedText style={styles.hospitalType}>{item.type}</ThemedText>
-        <View style={styles.locationContainer}>
-          <Ionicons name="location-outline" size={16} color="white" />
-          <ThemedText style={styles.location}>
-            {item.location} ({item.distance})
-          </ThemedText>
-        </View>
+        <ThemedText style={[styles.description, { color: themeColors.textSecondary }]}>
+          {item.description}
+        </ThemedText>
         <View style={styles.statsContainer}>
           <View style={styles.stat}>
-            <Ionicons name="people-outline" size={16} color="white" />
-            <ThemedText style={styles.statText}>{item.doctors} Doctors</ThemedText>
+            <Ionicons name="people-outline" size={16} color={themeColors.textSecondary} />
+            <ThemedText style={[styles.statText, { color: themeColors.textSecondary }]}>
+              {item.doctors} Doctors
+            </ThemedText>
           </View>
           <View style={styles.stat}>
-            <Ionicons name="bed-outline" size={16} color="white" />
-            <ThemedText style={styles.statText}>{item.beds} Beds</ThemedText>
+            <Ionicons name="bed-outline" size={16} color={themeColors.textSecondary} />
+            <ThemedText style={[styles.statText, { color: themeColors.textSecondary }]}>
+              {item.beds} Beds
+            </ThemedText>
           </View>
+        </View>
+        <View style={styles.locationContainer}>
+          <Ionicons name="location-outline" size={16} color={themeColors.primary} />
+          <ThemedText style={[styles.distance, { color: themeColors.primary }]}>
+            {item.distance}
+          </ThemedText>
         </View>
       </View>
     </TouchableOpacity>
@@ -80,42 +172,47 @@ export default function HospitalsScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: themeColors.background }]}>
       <View style={styles.mainContent}>
-        <View style={styles.header}>
-          <ThemedText style={styles.title}>Find Hospitals</ThemedText>
-        </View>
+        {/* Categories ScrollView */}
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoriesScroll}
+          contentContainerStyle={styles.categoriesContainer}
+        >
+          {hospitalCategories.map((category) => (
+            <TouchableOpacity
+              key={category.id}
+              style={[
+                styles.categoryItem,
+                { 
+                  backgroundColor: selectedCategory === category.name ? category.color : themeColors.surface,
+                  borderColor: category.color,
+                  borderWidth: 1,
+                }
+              ]}
+              onPress={() => setSelectedCategory(category.name)}
+            >
+              <ThemedText style={styles.categoryIcon}>{category.icon}</ThemedText>
+              <ThemedText 
+                style={[
+                  styles.categoryName,
+                  { color: selectedCategory === category.name ? '#000000' : themeColors.text }
+                ]}
+              >
+                {category.name}
+              </ThemedText>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
-        <View style={[styles.searchContainer, { backgroundColor: themeColors.searchBar }]}>
-          <Ionicons name="search-outline" size={20} color={themeColors.textSecondary} />
-          <TextInput
-            style={[styles.searchInput, { color: themeColors.text }]}
-            placeholder="Search hospitals by name or type"
-            placeholderTextColor={themeColors.textSecondary}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
-
-        <View style={styles.categoriesContainer}>
-          <Carousel
-            data={categories}
-            renderItem={renderCategoryCard}
-            sliderWidth={width}
-            itemWidth={width * 0.8}
-            activeSlideAlignment="start"
-            inactiveSlideScale={1}
-            inactiveSlideOpacity={1}
-            containerCustomStyle={styles.carousel}
-          />
-        </View>
-
+        {/* Hospitals List */}
         <FlatList
-          data={filteredHospitals}
+          data={hospitalData[selectedCategory]}
           renderItem={renderHospitalCard}
           keyExtractor={item => item.id.toString()}
+          contentContainerStyle={styles.hospitalsList}
           numColumns={numColumns}
           columnWrapperStyle={isTablet && styles.columnWrapper}
-          contentContainerStyle={styles.list}
-          showsVerticalScrollIndicator={false}
         />
       </View>
     </SafeAreaView>
@@ -132,60 +229,39 @@ const styles = StyleSheet.create({
     width: '100%',
     alignSelf: 'center',
   },
-  header: {
-    padding: getResponsiveSpacing(16),
-  },
-  title: {
-    fontSize: getResponsiveFontSize(24),
-    fontWeight: 'bold',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: getResponsiveSpacing(16),
-    padding: getResponsiveSpacing(12),
-    borderRadius: getResponsiveSpacing(8),
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: getResponsiveSpacing(8),
-    fontSize: getResponsiveFontSize(16),
+  categoriesScroll: {
+    marginVertical: getResponsiveSpacing(16),
   },
   categoriesContainer: {
-    marginBottom: getResponsiveSpacing(16),
+    paddingHorizontal: getResponsiveSpacing(16),
   },
-  carousel: {
-    paddingLeft: getResponsiveSpacing(16),
-  },
-  categoryCard: {
-    width: '100%',
-    height: getResponsiveValue(160, 180, 200),
-    borderRadius: getResponsiveSpacing(12),
-    overflow: 'hidden',
-  },
-  categoryImage: {
-    width: '100%',
-    height: '70%',
-    resizeMode: 'cover',
-  },
-  categoryTitle: {
-    color: 'white',
-    fontSize: getResponsiveFontSize(16),
-    fontWeight: 'bold',
+  categoryItem: {
     padding: getResponsiveSpacing(12),
+    borderRadius: getResponsiveSpacing(12),
+    marginRight: getResponsiveSpacing(12),
+    alignItems: 'center',
+    minWidth: 100,
   },
-  list: {
+  categoryIcon: {
+    fontSize: getResponsiveFontSize(24),
+    marginBottom: getResponsiveSpacing(4),
+  },
+  categoryName: {
+    fontSize: getResponsiveFontSize(14),
+    fontWeight: '600',
+  },
+  hospitalsList: {
     padding: getResponsiveSpacing(16),
+    gap: getResponsiveSpacing(16),
   },
   columnWrapper: {
-    justifyContent: 'space-between',
     gap: getResponsiveSpacing(16),
   },
   hospitalCard: {
     flex: 1,
     borderRadius: getResponsiveSpacing(12),
-    marginBottom: getResponsiveSpacing(16),
     overflow: 'hidden',
+    marginBottom: getResponsiveSpacing(16),
   },
   hospitalImage: {
     width: '100%',
@@ -199,52 +275,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: getResponsiveSpacing(4),
+    marginBottom: getResponsiveSpacing(8),
   },
   hospitalName: {
     fontSize: getResponsiveFontSize(18),
     fontWeight: 'bold',
-    color: 'white',
     flex: 1,
   },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
   },
   rating: {
-    marginLeft: getResponsiveSpacing(4),
+    fontSize: getResponsiveFontSize(14),
     fontWeight: 'bold',
-    color: 'white',
+    color: '#FFD700',
   },
-  hospitalType: {
+  description: {
     fontSize: getResponsiveFontSize(14),
-    marginBottom: getResponsiveSpacing(8),
-    color: 'white',
-    opacity: 0.9,
-  },
-  locationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: getResponsiveSpacing(8),
-  },
-  location: {
-    marginLeft: getResponsiveSpacing(4),
-    fontSize: getResponsiveFontSize(14),
-    color: 'white',
-    opacity: 0.9,
+    marginBottom: getResponsiveSpacing(12),
   },
   statsContainer: {
     flexDirection: 'row',
     gap: getResponsiveSpacing(16),
+    marginBottom: getResponsiveSpacing(12),
   },
   stat: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
   },
   statText: {
-    marginLeft: getResponsiveSpacing(4),
     fontSize: getResponsiveFontSize(14),
-    color: 'white',
-    opacity: 0.9,
+  },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  distance: {
+    fontSize: getResponsiveFontSize(14),
+    fontWeight: '600',
   },
 });

@@ -1,10 +1,11 @@
-import React from 'react';
-import { StyleSheet, TouchableOpacity, View, ScrollView, Image } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, TouchableOpacity, View, ScrollView, Image, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedView } from '@/components/ui/ThemedView';
 import { ThemedText } from '@/components/ui/ThemedText';
+import { AppointmentBookingModal } from '@/components/ui/AppointmentBookingModal';
 import { useTheme } from '@/context/ThemeContext';
 import { lightTheme, darkTheme } from '@/constants/theme';
 import { hospitals } from '@/data/hospitals';
@@ -14,6 +15,7 @@ export default function HospitalDetailsScreen() {
   const router = useRouter();
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
+  const [showBooking, setShowBooking] = useState(false);
 
   const hospital = hospitals.find(h => h.id.toString() === id);
 
@@ -24,6 +26,10 @@ export default function HospitalDetailsScreen() {
       </SafeAreaView>
     );
   }
+
+  const handleBookAppointment = () => {
+    setShowBooking(true);
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: themeColors.background }]}>
@@ -77,58 +83,34 @@ export default function HospitalDetailsScreen() {
             </View>
           </View>
 
-          <View style={[styles.section, { backgroundColor: themeColors.surface }]}>
-            <ThemedText style={styles.sectionTitle}>About</ThemedText>
-            <ThemedText style={[styles.description, { color: themeColors.textSecondary }]}>
-              {hospital.description}
-            </ThemedText>
-          </View>
-
-          <View style={[styles.section, { backgroundColor: themeColors.surface }]}>
-            <ThemedText style={styles.sectionTitle}>Departments</ThemedText>
-            <View style={styles.tagContainer}>
-              {hospital.departments.map((dept, index) => (
-                <View 
-                  key={index} 
-                  style={[styles.tag, { backgroundColor: themeColors.background }]}
-                >
-                  <ThemedText style={styles.tagText}>{dept}</ThemedText>
-                </View>
-              ))}
-            </View>
-          </View>
-
-          <View style={[styles.section, { backgroundColor: themeColors.surface }]}>
-            <ThemedText style={styles.sectionTitle}>Facilities</ThemedText>
-            <View style={styles.tagContainer}>
-              {hospital.facilities.map((facility, index) => (
-                <View 
-                  key={index} 
-                  style={[styles.tag, { backgroundColor: themeColors.background }]}
-                >
-                  <ThemedText style={styles.tagText}>{facility}</ThemedText>
-                </View>
-              ))}
-            </View>
-          </View>
-
-          <View style={[styles.section, { backgroundColor: themeColors.surface }]}>
-            <ThemedText style={styles.sectionTitle}>Contact</ThemedText>
-            <View style={styles.contactInfo}>
-              <View style={styles.contactItem}>
-                <Ionicons name="call" size={20} color={themeColors.primary} />
-                <ThemedText style={styles.contactText}>{hospital.contact}</ThemedText>
-              </View>
-              <View style={styles.contactItem}>
-                <Ionicons name="alert-circle" size={20} color={themeColors.error} />
-                <ThemedText style={[styles.contactText, { color: themeColors.error }]}>
-                  Emergency: {hospital.emergency}
-                </ThemedText>
-              </View>
-            </View>
-          </View>
+          <TouchableOpacity 
+            style={[styles.bookButton, { backgroundColor: themeColors.primary }]}
+            onPress={handleBookAppointment}
+          >
+            <ThemedText style={styles.bookButtonText}>Book Appointment</ThemedText>
+          </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <AppointmentBookingModal
+        visible={showBooking}
+        onClose={() => setShowBooking(false)}
+        onConfirm={(date, time) => {
+          Alert.alert(
+            'Appointment Confirmed',
+            `Your appointment has been scheduled for ${date} at ${time}`,
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  setShowBooking(false);
+                  router.push('/appointment');
+                }
+              }
+            ]
+          );
+        }}
+      />
     </SafeAreaView>
   );
 }
@@ -205,42 +187,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 2,
   },
-  section: {
+  bookButton: {
     padding: 16,
     borderRadius: 12,
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  description: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  tagContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  tag: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  tagText: {
-    fontSize: 14,
-  },
-  contactInfo: {
-    gap: 12,
-  },
-  contactItem: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    marginTop: 16,
   },
-  contactText: {
+  bookButtonText: {
+    color: 'white',
     fontSize: 16,
+    fontWeight: 'bold',
   },
 });

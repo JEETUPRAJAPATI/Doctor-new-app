@@ -13,7 +13,8 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.jection.Firstapp"
     },
     "web": {
       "bundler": "metro",
@@ -24,6 +25,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "f2884bd9-e16d-465e-b794-e9ad4e2ce76f"
+      }
     }
   }
 }

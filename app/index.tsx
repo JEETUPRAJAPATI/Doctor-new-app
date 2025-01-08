@@ -1,14 +1,14 @@
-import { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { useRouter } from 'expo-router';
-import Animated, { 
-  useAnimatedStyle, 
-  useSharedValue, 
+import { useEffect } from "react";
+import { StyleSheet, View } from "react-native";
+import { useRouter } from "expo-router";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
   withSequence,
   withTiming,
-  runOnJS
-} from 'react-native-reanimated';
-import { Image } from '@/components/ui/Image';
+  runOnJS,
+} from "react-native-reanimated";
+import { Image } from "@/components/ui/Image";
 
 export default function Index() {
   const router = useRouter();
@@ -16,7 +16,7 @@ export default function Index() {
   const scale = useSharedValue(0.3);
 
   const navigateToLogin = () => {
-    router.replace('/login');
+    router.replace("/login");
   };
 
   useEffect(() => {
@@ -37,13 +37,17 @@ export default function Index() {
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    transform: [{ scale: scale.value }]
+    transform: [{ scale: scale.value }],
   }));
 
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.logoContainer, animatedStyle]}>
-        <Image type="APP_ICON" style={styles.logo} />
+        <Image
+          source={require("../assets/images/doctor.png")}
+          type="APP_ICON"
+          style={styles.logo}
+        />
         <Animated.Text style={[styles.title]}>DoctoPro</Animated.Text>
       </Animated.View>
     </View>
@@ -53,21 +57,21 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#6366f1',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#6366f1",
+    alignItems: "center",
+    justifyContent: "center",
   },
   logoContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   logo: {
-    width: 120,
-    height: 120,
+    width: 200,
+    height: 170,
     marginBottom: 20,
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
   },
 });
