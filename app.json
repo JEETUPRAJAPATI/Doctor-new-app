@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Firstapp",
-    "slug": "Firstapp",
+    "name": "firstapp",
+    "slug": "firstapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "myapp",
@@ -14,7 +14,7 @@
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
-      "package": "com.jection.Firstapp"
+      "package": "com.jection.firstapp"
     },
     "web": {
       "bundler": "metro",
@@ -31,7 +31,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "f2884bd9-e16d-465e-b794-e9ad4e2ce76f"
+        "projectId": "c0ea5ffc-474d-46d6-a145-8c7255c65c15"
       }
     }
   }
